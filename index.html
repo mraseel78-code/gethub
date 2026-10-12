@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشغل موسيقى احترافي</title>
+    <!-- استيراد خط عربي جميل من Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- استيراد أيقونات Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #311042);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .player-container {
+            width: 360px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        /* رأس المشغل */
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .player-header i {
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .player-header i:hover {
+            color: #fff;
+        }
+
+        /* غلاف الألبوم / الصورة */
+        .artwork-box {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+            border: 4px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .artwork-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .playing .artwork-box img {
+            animation: rotateAlbum 20s linear infinite;
+        }
+
+        @keyframes rotateAlbum {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* معلومات الأغنية */
+        .track-info {
+            margin-bottom: 25px;
+        }
+
+        .track-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #f8fafc;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-artist {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        /* شريط التقدم */
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #ec4899);
+            border-radius: 3px;
+            position: relative;
+            transition: width 0.1s linear;
+        }
+
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+
+        /* أزرار التحكم */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 0 10px;
+        }
+
+        .controls i {
+            cursor: pointer;
+            color: #cbd5e1;
+            transition: 0.2s;
+        }
+
+        .controls i:hover {
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .controls .fa-shuffle, .controls .fa-repeat {
+            font-size: 16px;
+        }
+
+        .controls .fa-backward-step, .controls .fa-forward-step {
+            font-size: 22px;
+        }
+
+        .play-pause-btn {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.4);
+            transition: 0.3s;
+        }
+
+        .play-pause-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 15px 25px rgba(236, 72, 153, 0.5);
+        }
+
+        .play-pause-btn i {
+            color: #fff;
+            font-size: 22px;
+        }
+
+        /* التحكم في الصوت */
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .volume-container i {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .volume-slider {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ec4899;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body id="body">
+
+    <div class="player-container" id="playerContainer">
+        <!-- رأس المشغل -->
+        <div class="player-header">
+            <i class="fa-solid fa-chevron-down"></i>
+            <span>تشغيل الآن</span>
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+        </div>
+
+        <!-- غلاف الألبوم -->
+        <div class="artwork-box">
+            <img id="artwork" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=60" alt="Album Art">
+        </div>
+
+        <!-- معلومات الأغنية -->
+        <div class="track-info">
+            <div class="track-title" id="trackTitle">اسم الأغنية الافتراضية</div>
+            <div class="track-artist" id="trackArtist">اسم الفنان</div>
+        </div>
+
+        <!-- شريط التقدم والوقت -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="time-info">
+                <span id="currentTime">00:00</span>
+                <span id="duration">00:00</span>
+            </div>
+        </div>
+
+        <!-- الأزرار الرئيسية -->
+        <div class="controls">
+            <i class="fa-solid fa-shuffle" id="shuffleBtn" title="تشغيل عشوائي"></i>
+            <i class="fa-solid fa-backward-step" id="prevBtn" title="السابق"></i>
+            <div class="play-pause-btn" id="playPauseBtn">
+                <i class="fa-solid fa-play" id="playPauseIcon"></i>
+            </div>
+            <i class="fa-solid fa-forward-step" id="nextBtn" title="التالي"></i>
+            <i class="fa-solid fa-repeat" id="repeatBtn" title="تكرار"></i>
+        </div>
+
+        <!-- تحكم الصوت -->
+        <div class="volume-container">
+            <i class="fa-solid fa-volume-high"></i>
+            <input type="range" min="0" max="1" step="0.01" value="1" class="volume-slider" id="volumeSlider">
+        </div>
+    </div>
+
+    <!-- عنصر الصوت (Audio Element) -->
+    <audio id="audioElement"></audio>
+
+    <script>
+        // قائمة الأغاني (يمكنك استبدال الروابط بأغنيك الخاصة)
+        const songs = [
+            {
+                title: "مقطوعة هادئة استرخاء",
+                artist: "فنان عالمي",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+                cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=60"
+            },
+            {
+                title: "إيقاع إلكتروني عصري",
+                artist: "دي جي استوديو",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+                cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&auto=format&fit=crop&q=60"
+            },
+            {
+                title: "موسيقى بيانو كلاسيكية",
+                artist: "عازف البيانو",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+                cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&auto=format&fit=crop&q=60"
+            }
+        ];
+
+        let currentSongIndex = 0;
+        const audioElement = document.getElementById('audioElement');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playPauseIcon = document.getElementById('playPauseIcon');
+        const trackTitle = document.getElementById('trackTitle');
+        const trackArtist = document.getElementById('trackArtist');
+        const artwork = document.getElementById('artwork');
+        const progressBar = document.getElementById('progressBar');
+        const progress = document.getElementById('progress');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const playerContainer = document.getElementById('playerContainer');
+
+        // تحميل الأغنية الحالية
+        function loadSong(songIndex) {
+            const song = songs[songIndex];
+            trackTitle.textContent = song.title;
+            trackArtist.textContent = song.artist;
+            artwork.src = song.cover;
+            audioElement.src = song.src;
+        }
+
+        // تشغيل أو إيقاف الأغنية
+        function togglePlayPause() {
+            if (audioElement.paused) {
+                audioElement.play();
+                playPauseIcon.classList.replace('fa-play', 'fa-pause');
+                playerContainer.classList.add('playing');
+            } else {
+                audioElement.pause();
+                playPauseIcon.classList.replace('fa-pause', 'fa-play');
+                playerContainer.classList.remove('playing');
+            }
+        }
+
+        playPauseBtn.addEventListener('click', togglePlayPause);
+
+        // الأغنية التالية
+        nextBtn.addEventListener('click', () => {
+            currentSongIndex = (currentSongIndex + 1) % songs.length;
+            loadSong(currentSongIndex);
+            audioElement.play();
+            playPauseIcon.classList.replace('fa-play', 'fa-pause');
+            playerContainer.classList.add('playing');
+        });
+
+        // الأغنية السابقة
+        prevBtn.addEventListener('click', () => {
+            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+            loadSong(currentSongIndex);
+            audioElement.play();
+            playPauseIcon.classList.replace('fa-play', 'fa-pause');
+            playerContainer.classList.add('playing');
+        });
+
+        // تحديث شريط التقدم والوقت
+        audioElement.addEventListener('timeupdate', (e) => {
+            const { currentTime, duration } = e.target;
+            if (isNaN(duration)) return;
+            const progressPercent = (currentTime / duration) * 100;
+            progress.style.width = `${progressPercent}%`;
+
+            // تنسيق الوقت (الدقائق والثواني)
+            let currentMinutes = Math.floor(currentTime / 60);
+            let currentSeconds = Math.floor(currentTime % 60);
+            if (currentSeconds < 10) currentSeconds = `0${currentSeconds}`;
+            currentTimeEl.textContent = `${currentMinutes}:${currentSeconds}`;
+
+            let durationMinutes = Math.floor(duration / 60);
+            let durationSeconds = Math.floor(duration % 60);
+            if (durationSeconds < 10) durationSeconds = `0${durationSeconds}`;
+            if (!isNaN(durationMinutes)) {
+                durationEl.textContent = `${durationMinutes}:${durationSeconds}`;
+            }
+        });
+
+        // التحرير عبر شريط التقدم للانتقال في الأغنية
+        progressBar.addEventListener('click', (e) => {
+            const width = progressBar.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audioElement.duration;
+            audioElement.currentTime = (clickX / width) * duration;
+        });
+
+        // التحكم في الصوت
+        volumeSlider.addEventListener('input', (e) => {
+            audioElement.volume = e.target.value;
+        });
+
+        // الانتقال التلقائي للأغنية التالية عند انتهاء الحالية
+        audioElement.addEventListener('ended', () => {
+            nextBtn.click();
+        });
+
+        // التهيئة الأولية عند تحميل الصفحة
+        loadSong(currentSongIndex);
+    </script>
+</body>
+</html>
